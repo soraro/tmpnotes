@@ -1,0 +1,7 @@
+body { background-color: var(--bs-dark) !important;
+       color: var(--bs-light);
+}
+
+.row{
+  margin-bottom: 5%;
+}
