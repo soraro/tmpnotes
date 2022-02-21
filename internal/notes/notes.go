@@ -81,7 +81,6 @@ func checkAcceptableLength(m string) bool {
 }
 
 func GetNote(w http.ResponseWriter, r *http.Request) {
-	var n note
 
 	if r.Method != "GET" {
 		http.Error(w, "Invalid Request", 400)
@@ -98,7 +97,7 @@ func GetNote(w http.ResponseWriter, r *http.Request) {
 			fmt.Fprintf(w, "404 - Nothing to see here")
 		} else {
 			t, _ := template.ParseFiles("./templates/404.html")
-			t.Execute(w, n)
+			t.Execute(w, nil)
 		}
 		return
 	case err != nil:
@@ -111,24 +110,23 @@ func GetNote(w http.ResponseWriter, r *http.Request) {
 			fmt.Fprintf(w, "404 - Nothing to see here")
 		} else {
 			t, _ := template.ParseFiles("./templates/404.html")
-			t.Execute(w, n)
+			t.Execute(w, nil)
 		}
 		return
 	}
-	n.Message = val
 
 	if returnData(r.UserAgent(), r.Header.Get("X-Note")) {
 		rdb.Del(ctx, id)
-		fmt.Fprintf(w, n.Message)
+		fmt.Fprint(w, val)
 		return
 	}
 
-	rdb.Del(ctx, id)
+	//rdb.Del(ctx, id)
 	t, err := template.ParseFiles("./templates/note.html")
 	if err != nil {
 		http.Error(w, "Error rendering note", 500)
 	}
-	t.Execute(w, n)
+	t.Execute(w, nil)
 }
 
 // Check headers to see if we should return the data or not.
