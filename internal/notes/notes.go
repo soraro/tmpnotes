@@ -16,6 +16,7 @@ import (
 )
 
 const maxLength = 1000
+const maxExpire = 24
 
 var (
 	ctx = context.Background()
@@ -60,6 +61,12 @@ func AddNote(w http.ResponseWriter, r *http.Request) {
 		// Avoid having no expiration time
 		n.Expire = 1
 	}
+
+	if n.Expire > maxExpire {
+		http.Error(w, "Invalid Request - TTL is too high", 400)
+		return
+	}
+
 	if !checkAcceptableLength(n.Message) {
 		log.Errorf("Message size too large: %v", len(n.Message))
 		http.Error(w, "Invalid Request", 400)
