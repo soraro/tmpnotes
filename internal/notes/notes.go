@@ -81,7 +81,6 @@ func checkAcceptableLength(m string) bool {
 }
 
 func GetNote(w http.ResponseWriter, r *http.Request) {
-	var n note
 
 	if r.Method != "GET" {
 		http.Error(w, "Invalid Request", 400)
@@ -94,8 +93,12 @@ func GetNote(w http.ResponseWriter, r *http.Request) {
 	switch {
 	case err == redis.Nil:
 		w.WriteHeader(404)
-		t, _ := template.ParseFiles("./templates/404.html")
-		t.Execute(w, n)
+		if textResponse(r.UserAgent()) {
+			fmt.Fprintf(w, "404 - Nothing to see here")
+		} else {
+			t, _ := template.ParseFiles("./templates/404.html")
+			t.Execute(w, nil)
+		}
 		return
 	case err != nil:
 		fmt.Println("Get failed", err)
@@ -103,17 +106,49 @@ func GetNote(w http.ResponseWriter, r *http.Request) {
 		return
 	case val == "":
 		w.WriteHeader(404)
-		t, _ := template.ParseFiles("./templates/404.html")
-		t.Execute(w, n)
+		if textResponse(r.UserAgent()) {
+			fmt.Fprintf(w, "404 - Nothing to see here")
+		} else {
+			t, _ := template.ParseFiles("./templates/404.html")
+			t.Execute(w, nil)
+		}
 		return
 	}
-	n.Message = val
 
-	rdb.Del(ctx, id)
+	if returnData(r.UserAgent(), r.Header.Get("X-Note")) {
+		rdb.Del(ctx, id)
+		fmt.Fprint(w, val)
+		return
+	}
 
+	//rdb.Del(ctx, id)
 	t, err := template.ParseFiles("./templates/note.html")
 	if err != nil {
 		http.Error(w, "Error rendering note", 500)
 	}
-	t.Execute(w, n)
+	t.Execute(w, nil)
+}
+
+// Check headers to see if we should return the data or not.
+// This helps make it so various link previews won't instantly burn the note
+func returnData(useragent, header string) bool {
+	if textResponse(useragent) {
+		return true
+	} else {
+		// A predictable header we can use to signal the note can be returned/destroyed
+		return header == "Destroy"
+	}
+}
+
+// Check the user-agent for to see if we should return a text response
+func textResponse(useragent string) bool {
+	// add other user agents here that will burn the note right away
+	acceptedUserAgents := []string{"curl", "wget"}
+
+	for _, v := range acceptedUserAgents {
+		if strings.Contains(strings.ToLower(useragent), v) {
+			return true
+		}
+	}
+	return false
 }
