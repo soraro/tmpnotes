@@ -5,7 +5,7 @@ ENV GOPATH /go
 ENV CGO_ENABLED=0
 
 ARG DISABLE_TESTS
-RUN if [[ "$DISABLE_TESTS" = "true" ]] ; then echo Skipping Tests ; else go test; fi
+RUN if [[ "$DISABLE_TESTS" = "true" ]] ; then echo Skipping Tests ; else go test ./...; fi
 RUN GOOS=linux GOARCH=amd64 go build
 
 FROM alpine:latest
