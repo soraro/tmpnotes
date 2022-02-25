@@ -101,7 +101,7 @@ func GetNote(w http.ResponseWriter, r *http.Request) {
 	case err == redis.Nil:
 		w.WriteHeader(404)
 		if textResponse(r.UserAgent()) {
-			fmt.Fprintf(w, "404 - Nothing to see here")
+			fmt.Fprintf(w, "404 - Nothing to see here\n")
 		} else {
 			t, _ := template.ParseFiles("./templates/404.html")
 			t.Execute(w, nil)
@@ -124,11 +124,15 @@ func GetNote(w http.ResponseWriter, r *http.Request) {
 
 	if returnData(r.UserAgent(), r.Header.Get("X-Note")) {
 		rdb.Del(ctx, id)
-		fmt.Fprint(w, val)
+		// add a newline for text clients so your prompt wont start in the middle of the line
+		if textResponse(r.UserAgent()) {
+			fmt.Fprint(w, val+"\n")
+		} else {
+			fmt.Fprint(w, val)
+		}
 		return
 	}
 
-	//rdb.Del(ctx, id)
 	t, err := template.ParseFiles("./templates/note.html")
 	if err != nil {
 		http.Error(w, "Error rendering note", 500)
