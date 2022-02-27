@@ -103,7 +103,7 @@ func GetNote(w http.ResponseWriter, r *http.Request) {
 		if textResponse(r.UserAgent()) {
 			fmt.Fprintf(w, "404 - Nothing to see here")
 		} else {
-		t, _ := template.ParseFiles("./templates/404.html")
+			t, _ := template.ParseFiles("./templates/404.html")
 			t.Execute(w, nil)
 		}
 		return
