@@ -20,6 +20,7 @@ func main() {
 	http.Handle("/", http.FileServer(http.Dir("./static")))
 	http.HandleFunc("/new", notes.AddNote)
 	http.HandleFunc("/id/", notes.GetNote)
+	http.HandleFunc("/counts", notes.GetCounts)
 	log.Info("Server listening at ", port)
 	http.ListenAndServe(port, nil)
 }

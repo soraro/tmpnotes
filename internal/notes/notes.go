@@ -50,6 +50,7 @@ func AddNote(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid Request", 400)
 		return
 	}
+	log.Info(r.RequestURI)
 
 	var n note
 	err := json.NewDecoder(r.Body).Decode(&n)
@@ -73,7 +74,15 @@ func AddNote(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	uuid := getId()
-	rdb.Set(ctx, uuid, n.Message, time.Duration(n.Expire)*time.Hour)
+
+	pipe := rdb.Pipeline()
+	pipe.Set(ctx, uuid, n.Message, time.Duration(n.Expire)*time.Hour)
+	pipe.HIncrBy(ctx, "counts", noteType(n.Message), 1)
+	_, err = pipe.Exec(ctx)
+	if err != nil {
+		log.Errorf("Error setting note values: %s", err)
+	}
+
 	fmt.Fprint(w, uuid)
 
 }
@@ -85,6 +94,19 @@ func getId() string {
 
 func checkAcceptableLength(m string) bool {
 	return len(m) <= maxLength
+}
+
+// return the type of note from the first 5 characters
+func noteType(note string) string {
+	if len(note) < 5 {
+		return "noteCount"
+	}
+	if note[0:5] == "[ENC]" {
+		return "encNoteCount"
+	} else {
+		return "noteCount"
+	}
+
 }
 
 func GetNote(w http.ResponseWriter, r *http.Request) {
