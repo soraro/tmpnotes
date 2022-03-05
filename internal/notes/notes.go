@@ -46,11 +46,13 @@ func init() {
 
 func AddNote(w http.ResponseWriter, r *http.Request) {
 
+	log.Info(r.RequestURI)
+
 	if r.Method != "POST" {
+		log.Errorf("%s Invalid request method: %s", r.RequestURI, r.Method)
 		http.Error(w, "Invalid Request", 400)
 		return
 	}
-	log.Info(r.RequestURI)
 
 	var n note
 	err := json.NewDecoder(r.Body).Decode(&n)
@@ -64,12 +66,13 @@ func AddNote(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if n.Expire > maxExpire {
+		log.Errorf("%s Expiration set too high: %v", r.RequestURI, n.Expire)
 		http.Error(w, "Invalid Request - TTL is too high", 400)
 		return
 	}
 
 	if !checkAcceptableLength(n.Message) {
-		log.Errorf("Message size too large: %v", len(n.Message))
+		log.Errorf("%s Message size too large: %v", r.RequestURI, len(n.Message))
 		http.Error(w, "Invalid Request", 400)
 		return
 	}
@@ -80,7 +83,7 @@ func AddNote(w http.ResponseWriter, r *http.Request) {
 	pipe.HIncrBy(ctx, "counts", noteType(n.Message), 1)
 	_, err = pipe.Exec(ctx)
 	if err != nil {
-		log.Errorf("Error setting note values: %s", err)
+		log.Errorf("%s Error setting note values: %s", r.RequestURI, err)
 	}
 
 	fmt.Fprint(w, uuid)
@@ -111,11 +114,13 @@ func noteType(note string) string {
 
 func GetNote(w http.ResponseWriter, r *http.Request) {
 
+	log.Info(r.RequestURI)
+
 	if r.Method != "GET" {
+		log.Errorf("%s Invalid request method: %s", r.RequestURI, r.Method)
 		http.Error(w, "Invalid Request", 400)
 		return
 	}
-	log.Info(r.RequestURI)
 	id := strings.ReplaceAll(r.RequestURI, "/id/", "")
 
 	val, err := rdb.Get(ctx, id).Result()
@@ -130,7 +135,7 @@ func GetNote(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	case err != nil:
-		fmt.Println("Get failed", err)
+		log.Errorf("%s Redis GET failed: %s", r.RequestURI, err)
 		http.Error(w, "Server Error", 500)
 		return
 	case val == "":
@@ -157,6 +162,7 @@ func GetNote(w http.ResponseWriter, r *http.Request) {
 
 	t, err := template.ParseFiles("./templates/note.html")
 	if err != nil {
+		log.Errorf("%s Error rendering note: %s", r.RequestURI, err)
 		http.Error(w, "Error rendering note", 500)
 	}
 	t.Execute(w, nil)

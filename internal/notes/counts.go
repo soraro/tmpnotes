@@ -15,11 +15,13 @@ type counts struct {
 
 func GetCounts(w http.ResponseWriter, r *http.Request) {
 
+	log.Info(r.RequestURI)
+
 	if r.Method != "GET" {
+		log.Errorf("%s Invalid request method: %s", r.RequestURI, r.Method)
 		http.Error(w, "Invalid Request", 400)
 		return
 	}
-	log.Info(r.RequestURI)
 
 	var c counts
 
@@ -30,7 +32,7 @@ func GetCounts(w http.ResponseWriter, r *http.Request) {
 	curnotes := pipe.Do(ctx, "DBSIZE")
 	_, err := pipe.Exec(ctx)
 	if err != nil {
-		log.Errorf("Error getting counts: %s", err)
+		log.Errorf("%s Error getting counts: %s", r.RequestURI, err)
 	}
 
 	c.CurrentNoteCount, _ = curnotes.Int()
@@ -38,7 +40,7 @@ func GetCounts(w http.ResponseWriter, r *http.Request) {
 	countdata.Scan(&c)
 	resp, err := json.Marshal(c)
 	if err != nil {
-		log.Errorf("Error in JSON marshal. Err: %s", err)
+		log.Errorf("%s Error in JSON marshal. Err: %s", r.RequestURI, err)
 	}
 
 	w.Write(resp)
