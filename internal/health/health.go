@@ -12,8 +12,8 @@ func HealthCheck(w http.ResponseWriter, r *http.Request) {
 	log.Info(r.RequestURI)
 
 	if r.Method == "GET" {
+		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
-		w.Header().Set("Content-Type", "applications/json")
 		resp := make(map[string]string)
 		resp["message"] = "Status OK"
 		jsonResp, err := json.Marshal(resp)
