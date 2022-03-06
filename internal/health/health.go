@@ -24,7 +24,7 @@ func HealthCheck(w http.ResponseWriter, r *http.Request) {
 		w.Write(jsonResp)
 		return
 	} else {
-		log.Errorf("healthcheck failed: %s %s", r.RequestURI, r.Method)
+		log.Errorf("%s healthcheck failed: %s", r.RequestURI, r.Method)
 		http.Error(w, "404 Not Found", 404)
 		return
 	}
