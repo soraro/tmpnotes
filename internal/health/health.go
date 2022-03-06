@@ -28,7 +28,7 @@ func HealthCheck(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Allow", "GET")
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		resp := make(map[string]string)
-		resp["message"] = "405 Not Allowed"
+		resp["message"] = "405 Method Not Allowed"
 		jsonResp, err := json.Marshal(resp)
 		if err != nil {
 			log.Errorf("%s healthcheck response format failed", r.RequestURI)
