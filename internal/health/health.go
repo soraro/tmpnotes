@@ -18,7 +18,7 @@ func HealthCheck(w http.ResponseWriter, r *http.Request) {
 		resp["message"] = "Status OK"
 		jsonResp, err := json.Marshal(resp)
 		if err != nil {
-			log.Error("healthcheck response format failed")
+			log.Errorf("%s healthcheck response format failed", r.RequestURI)
 			http.Error(w, "healthcheck failed", 500)
 		}
 		w.Write(jsonResp)
