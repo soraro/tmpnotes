@@ -121,3 +121,34 @@ func Test_textResponse(t *testing.T) {
 		})
 	}
 }
+
+func Test_noteType(t *testing.T) {
+	tests := []struct {
+		name string
+		note string
+		want string
+	}{
+		{
+			name: "Test 1",
+			note: "test",
+			want: "noteCount",
+		},
+		{
+			name: "Test 2",
+			note: "This is a test note",
+			want: "noteCount",
+		},
+		{
+			name: "Test 3",
+			note: "[ENC]abc123",
+			want: "encNoteCount",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := noteType(tt.note); got != tt.want {
+				t.Errorf("noteType() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
