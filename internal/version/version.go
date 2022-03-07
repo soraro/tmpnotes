@@ -28,6 +28,8 @@ func initBuild() build {
 	}
 	if len(gitSHA) >= 7 {
 		b.GitSHA = gitSHA[:7]
+	} else {
+		b.GitSHA = gitSHA
 	}
 	b.GoVersion = runtime.Version()
 	return b
