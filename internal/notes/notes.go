@@ -50,7 +50,8 @@ func AddNote(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method != "POST" {
 		log.Errorf("%s Invalid request method: %s", r.RequestURI, r.Method)
-		http.Error(w, "Invalid Request", 400)
+		w.Header().Set("Allow", "POST")
+		w.WriteHeader(http.StatusMethodNotAllowed)
 		return
 	}
 
@@ -118,7 +119,8 @@ func GetNote(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method != "GET" {
 		log.Errorf("%s Invalid request method: %s", r.RequestURI, r.Method)
-		http.Error(w, "Invalid Request", 400)
+		w.Header().Set("Allow", "GET")
+		w.WriteHeader(http.StatusMethodNotAllowed)
 		return
 	}
 	id := strings.ReplaceAll(r.RequestURI, "/id/", "")
