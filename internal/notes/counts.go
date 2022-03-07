@@ -19,7 +19,8 @@ func GetCounts(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method != "GET" {
 		log.Errorf("%s Invalid request method: %s", r.RequestURI, r.Method)
-		http.Error(w, "Invalid Request", 400)
+		w.Header().Set("Allow", "GET")
+		w.WriteHeader(http.StatusMethodNotAllowed)
 		return
 	}
 
