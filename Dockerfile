@@ -6,7 +6,10 @@ ENV CGO_ENABLED=0
 
 ARG DISABLE_TESTS
 RUN if [[ "$DISABLE_TESTS" = "true" ]] ; then echo Skipping Tests ; else go test ./...; fi
-RUN GOOS=linux GOARCH=amd64 go build
+
+ARG VERSION
+ARG GITSHA
+RUN GOOS=linux GOARCH=amd64 go build -ldflags "-s -w -X 'tmpnotes/internal/version.version=${VERSION}' -X 'tmpnotes/internal/version.gitSHA=${GITSHA}'"
 
 FROM alpine:latest
 COPY --from=build /app/tmpnotes /app/

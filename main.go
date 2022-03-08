@@ -8,6 +8,7 @@ import (
 
 	"tmpnotes/internal/health"
 	"tmpnotes/internal/notes"
+	"tmpnotes/internal/version"
 )
 
 func main() {
@@ -23,6 +24,7 @@ func main() {
 	http.HandleFunc("/id/", notes.GetNote)
 	http.HandleFunc("/counts", notes.GetCounts)
 	http.HandleFunc("/healthz", health.HealthCheck)
+	http.HandleFunc("/version", version.GetVersion)
 	log.Info("Server listening at ", port)
 	http.ListenAndServe(port, nil)
 }
