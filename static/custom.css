@@ -1,7 +1,6 @@
 body { background-color: var(--bs-dark) !important;
        color: var(--bs-light);
 }
-
 .row{
   margin-bottom: 5%;
   --bs-gutter-x: 0;
@@ -9,4 +8,15 @@ body { background-color: var(--bs-dark) !important;
 
 .form-control {
   width: 99%;
+}
+
+.footer{
+  display: table;
+  text-align: center;
+  margin-left: auto;
+  margin-right: auto;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
 }
