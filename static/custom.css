@@ -4,4 +4,9 @@ body { background-color: var(--bs-dark) !important;
 
 .row{
   margin-bottom: 5%;
+  --bs-gutter-x: 0;
+}
+
+.form-control {
+  width: 99%;
 }
