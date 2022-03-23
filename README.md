@@ -17,13 +17,15 @@ We understand that secrets are sensitive and people may not want to use a public
 ## docker-compose
 We have provided a `docker-compose` file to easily build and host a functional TMPNOTES system.
 ```
-docker-compose build
 docker-compose up
 ```
 Navigate to [localhost:5000](http://localhost:5000) and you will see your own tmpnotes instance running.
 
 ## Docker image
-*Coming soon! We will publish a docker image you can use directly on your infrastructure.*
+```
+docker pull ghcr.io/soraro/tmpnotes:latest
+```
+View all versions on the [ghcr package page](https://github.com/soraro/tmpnotes/pkgs/container/tmpnotes)
 
 ## Helm Chart
 *Coming soon!*
