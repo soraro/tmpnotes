@@ -15,7 +15,6 @@ body { background-color: var(--bs-dark) !important;
   text-align: center;
   margin-left: auto;
   margin-right: auto;
-  position: absolute;
   bottom: 0;
   left: 0;
   width: 100%;
