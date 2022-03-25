@@ -1,5 +1,7 @@
 # TMPNOTES
+[![.github/workflows/ci.yml](https://github.com/soraro/tmpnotes/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/soraro/tmpnotes/actions/workflows/ci.yml)  
 [https://tmpnotes.com](https://tmpnotes.com)
+
 
 Temporary notes that disappear after reading
 
@@ -61,3 +63,5 @@ go test -v ./...
 
 # Questions / Comments / Suggestions
 Please feel free to [open an issue](https://github.com/soraro/tmpnotes/issues/new)!
+
+
