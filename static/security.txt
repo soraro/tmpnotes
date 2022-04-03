@@ -1,0 +1,2 @@
+# Thank you for bringing a security issue to our attention!
+Contact: mailto:security@tmpnotes.com
