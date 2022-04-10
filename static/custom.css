@@ -12,7 +12,7 @@ body { background-color: var(--bs-dark) !important;
 
 .footer{
   display: table;
-  text-align: left;
+  text-align: center;
   margin-left: auto;
   margin-right: auto;
   bottom: 0;
@@ -22,7 +22,8 @@ body { background-color: var(--bs-dark) !important;
 
 @media (max-width: 500px) {
   .footer {
-    font-size: small
+    font-size: small;
+    text-align: left;
   }
   
 }
