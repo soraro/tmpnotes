@@ -30,7 +30,7 @@ jobs:
       - name: "Release with Changelog"
         uses: fregante/release-with-changelog@v2
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.GH_PAT }}
       - name: Build and push Docker image
         uses: docker/build-push-action@v2
         with:
