@@ -19,14 +19,18 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
-
+        with:
+          fetch-depth: 50
       - name: Log in to the Container registry
         uses: docker/login-action@v1
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-
+      - name: "Release with Changelog"
+        uses: fregante/release-with-changelog@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
       - name: Build and push Docker image
         uses: docker/build-push-action@v2
         with:
