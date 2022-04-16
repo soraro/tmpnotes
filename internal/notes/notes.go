@@ -6,13 +6,14 @@ import (
 	"fmt"
 	"html/template"
 	"net/http"
-	"os"
 	"strings"
 	"time"
 
 	"github.com/go-redis/redis/v8"
 	"github.com/google/uuid"
 	log "github.com/sirupsen/logrus"
+
+	cfg "tmpnotes/internal/config"
 )
 
 const maxLength = 1000
@@ -28,15 +29,9 @@ type note struct {
 	Expire  int    `json:"expire"`
 }
 
-func init() {
-	var redisConnectionString string
-	if os.Getenv("REDIS_URL") == "" {
-		redisConnectionString = "redis://localhost:6379"
-	} else {
-		redisConnectionString = os.Getenv("REDIS_URL")
-	}
+func RedisInit() {
 	log.SetFormatter(&log.JSONFormatter{})
-	opt, err := redis.ParseURL(redisConnectionString)
+	opt, err := redis.ParseURL(cfg.Config.RedisUrl)
 	if err != nil {
 		panic(err)
 	}

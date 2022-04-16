@@ -1,24 +1,29 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
-	"os"
 
 	log "github.com/sirupsen/logrus"
 
+	cfg "tmpnotes/internal/config"
 	"tmpnotes/internal/health"
 	"tmpnotes/internal/notes"
 	"tmpnotes/internal/version"
 )
 
-func main() {
-	var port string
+func init() {
 	log.SetFormatter(&log.JSONFormatter{})
-	if os.Getenv("PORT") == "" {
-		port = ":5000"
-	} else {
-		port = ":" + os.Getenv("PORT")
+	err := cfg.GetConfig()
+	if err != nil {
+		log.Fatal(err)
 	}
+	notes.RedisInit()
+}
+
+func main() {
+	port := fmt.Sprint(":", cfg.Config.Port)
+
 	http.Handle("/", http.FileServer(http.Dir("./static")))
 	http.HandleFunc("/new", notes.AddNote)
 	http.HandleFunc("/id/", notes.GetNote)
