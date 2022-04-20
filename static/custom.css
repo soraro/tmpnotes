@@ -27,3 +27,7 @@ body { background-color: var(--bs-dark) !important;
   }
   
 }
+#home-link {
+  text-decoration: none;
+  color: inherit;
+}
