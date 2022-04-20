@@ -1,5 +1,5 @@
 # TMPNOTES
-[![.github/workflows/ci.yml](https://github.com/soraro/tmpnotes/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/soraro/tmpnotes/actions/workflows/ci.yml)  
+[![.github/workflows/ci.yml](https://github.com/soraro/tmpnotes/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/soraro/tmpnotes/actions/workflows/ci.yml)
 [https://tmpnotes.com](https://tmpnotes.com)
 
 
@@ -15,6 +15,13 @@ If you don't want to send your information to [tmpnotes.com](https://tmpnotes.co
 
 # Run it yourself
 We understand that secrets are sensitive and people may not want to use a publicly hosted instance ([tmpnotes.com](https://tmpnotes.com)). The following is information you can use to run a TMPNOTES system yourself! We strongly suggest that any implementation you run yourself is fronted by a reverse proxy (such as NGINX) with TLS.
+
+## Environment variables
+The following table shows environment variables that can be used to configure your TMPNOTES installation:
+| Env var | Type | Description | Default |
+|---------|------|-------------|---------|
+| `TMPNOTES_PORT` | int | Port number for the application to use. The env var `PORT` can also be used. | `5000` |
+| `TMPNOTES_REDIS_URL` | string | Redis URI / connection string. `REDIS_URL` can also be used. | `redis://localhost:6379` |
 
 ## docker-compose
 We have provided a `docker-compose` file to easily build and host a functional TMPNOTES system.
