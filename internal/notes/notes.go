@@ -2,9 +2,11 @@ package notes
 
 import (
 	"context"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"html/template"
+	"io"
 	"net/http"
 	"strings"
 	"time"
@@ -14,6 +16,7 @@ import (
 	log "github.com/sirupsen/logrus"
 
 	cfg "tmpnotes/internal/config"
+	"tmpnotes/internal/crypto"
 )
 
 const maxLength = 1000
@@ -72,23 +75,48 @@ func AddNote(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid Request", 400)
 		return
 	}
-	uuid := getId()
+	id, key := generateIdAndKey()
 
+	encryptedMessage, err := encryptNote(n.Message, key)
+	if err != nil {
+		log.Errorf("%s Issue encrypting message: %s", r.RequestURI, err)
+	}
 	pipe := rdb.Pipeline()
-	pipe.Set(ctx, uuid, n.Message, time.Duration(n.Expire)*time.Hour)
+	pipe.Set(ctx, id, encryptedMessage, time.Duration(n.Expire)*time.Hour)
 	pipe.HIncrBy(ctx, "counts", noteType(n.Message), 1)
 	_, err = pipe.Exec(ctx)
 	if err != nil {
 		log.Errorf("%s Error setting note values: %s", r.RequestURI, err)
 	}
 
-	fmt.Fprint(w, uuid)
+	fmt.Fprint(w, id+key)
 
 }
 
-func getId() string {
-	uuid := uuid.NewString()
-	return strings.ReplaceAll(uuid, "-", "")
+// The first 8 characters will be the redis key (id)
+// The last 24 characters will be the key to encrypt the note
+func generateIdAndKey() (string, string) {
+	uuid, _ := uuid.NewRandom()
+	full := strings.ReplaceAll(uuid.String(), "-", "")
+	return full[:8], full[8:]
+}
+
+func encryptNote(note, key string) (string, error) {
+	out, err := crypto.Encrypt([]byte(note), keyBytes(key))
+	return hex.EncodeToString(out), err
+}
+
+// hash the key and take the first 32 characters
+func keyBytes(key string) *[32]byte {
+	hash := crypto.Hash("TMPNOTES", []byte(key))
+	hashedKey := hex.EncodeToString(hash)
+	r := strings.NewReader(hashedKey[:32])
+	kb := [32]byte{}
+	_, err := io.ReadFull(r, kb[:])
+	if err != nil {
+		panic(err)
+	}
+	return &kb
 }
 
 func checkAcceptableLength(m string) bool {
@@ -110,15 +138,17 @@ func noteType(note string) string {
 
 func GetNote(w http.ResponseWriter, r *http.Request) {
 
-	log.Info(r.RequestURI)
+	full := strings.ReplaceAll(r.RequestURI, "/id/", "")
+	id := full[:8]
+	key := full[8:]
+	log.Info(id)
 
 	if r.Method != "GET" {
-		log.Errorf("%s Invalid request method: %s", r.RequestURI, r.Method)
+		log.Errorf("%s Invalid request method: %s", id, r.Method)
 		w.Header().Set("Allow", "GET")
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		return
 	}
-	id := strings.ReplaceAll(r.RequestURI, "/id/", "")
 
 	val, err := rdb.Get(ctx, id).Result()
 	switch {
@@ -132,7 +162,7 @@ func GetNote(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	case err != nil:
-		log.Errorf("%s Redis GET failed: %s", r.RequestURI, err)
+		log.Errorf("%s Redis GET failed: %s", id, err)
 		http.Error(w, "Server Error", 500)
 		return
 	case val == "":
@@ -148,18 +178,23 @@ func GetNote(w http.ResponseWriter, r *http.Request) {
 
 	if returnData(r.UserAgent(), r.Header.Get("X-Note")) {
 		rdb.Del(ctx, id)
+		decNote, err := decryptNote(val, key)
+		if err != nil {
+			http.Error(w, "👀 401 Unauthorized", 401)
+			log.Errorf("Failed decrypting: %s", err)
+		}
 		// add a newline for text clients so your prompt wont start in the middle of the line
 		if textResponse(r.UserAgent()) {
-			fmt.Fprint(w, val+"\n")
+			fmt.Fprint(w, decNote+"\n")
 		} else {
-			fmt.Fprint(w, val)
+			fmt.Fprint(w, decNote)
 		}
 		return
 	}
 
 	t, err := template.ParseFiles("./templates/note.html")
 	if err != nil {
-		log.Errorf("%s Error rendering note: %s", r.RequestURI, err)
+		log.Errorf("%s Error rendering note: %s", id, err)
 		http.Error(w, "Error rendering note", 500)
 	}
 	t.Execute(w, nil)
@@ -187,4 +222,16 @@ func textResponse(useragent string) bool {
 		}
 	}
 	return false
+}
+
+func decryptNote(ciphernote, key string) (string, error) {
+	ct, err := hex.DecodeString(ciphernote)
+	if err != nil {
+		return "", err
+	}
+	out, err := crypto.Decrypt([]byte(ct), keyBytes(key))
+	if err != nil {
+		return "", err
+	}
+	return string(out), nil
 }

@@ -152,3 +152,19 @@ func Test_noteType(t *testing.T) {
 		})
 	}
 }
+
+func Test_encryptDecrypt(t *testing.T) {
+	cipherText, err := encryptNote("test", "44ec4dd68dd0aee62aedf766")
+	if err != nil {
+		t.Errorf("Encryption failed: %s", err)
+	}
+
+	plainText, err := decryptNote(cipherText, "44ec4dd68dd0aee62aedf766")
+	if err != nil {
+		t.Errorf("Decryption failed: %s", err)
+	}
+
+	if plainText != "test" {
+		t.Errorf("Decrypted text should be \"test\" but instead got: %s", plainText)
+	}
+}

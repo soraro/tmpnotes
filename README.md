@@ -6,10 +6,10 @@
 Temporary notes that disappear after reading
 
 # How it works
-TMPNOTES is a system to share secrets in a reasonably secure, temporary way. TMPNOTES uses a [redis](https://redis.io/) cache to store notes. Notes are immediately purged once a note has been read, or the user-defined TTL (time to live) has expired. Notes are only allowed a maximum TTL of 24 hours.
+TMPNOTES is a system to share secrets in a reasonably secure, temporary way. TMPNOTES uses a [redis](https://redis.io/) cache to store notes. Notes are immediately purged once a note has been read, or the user-defined TTL (time to live) has expired. Notes are only allowed a maximum TTL of 24 hours. All notes are encrypted [server side](docs/server-side-encryption.md), and only the user who generated the note has the full key.
 
 # Privacy
-We will never read notes that are stored in the redis database, and there are no backups that are ever taken for [tmpnotes.com](https://tmpnotes.com). The website has an encryption feature that can encrypt your note in the browser *before* it is sent to the server. This ensures that even if someone did view the database, the data would not be readable. The codebase is also small, and relatively easy to audit.
+All notes are encrypted using our [server side encryption feature](docs/server-side-encryption.md) so we can not, and will not ever attempt to read notes stored in the redis database. Since these notes are meant to be temporary, no database backups are ever taken for [tmpnotes.com](https://tmpnotes.com). In addition, the website has a feature that can encrypt your note in the browser *before* it is sent to the server. These measures ensure that even if someone did view the database, the data would not be readable. The codebase is also small, and relatively easy to audit.
 
 If you don't want to send your information to [tmpnotes.com](https://tmpnotes.com), we don't blame you! We want to make this project easy to run yourself if that is desired. We will host [tmpnotes.com](https://tmpnotes.com) as long as it does not become frequently abused or prohibitively expensive for us to do so.
 
