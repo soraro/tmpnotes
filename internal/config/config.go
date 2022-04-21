@@ -5,7 +5,7 @@ import (
 )
 
 type specification struct {
-	Port     int    `default:"5000"`
+	Port     int    `default:"5000" envconfig:"PORT"`
 	RedisUrl string `default:"redis://localhost:6379" envconfig:"REDIS_URL"`
 }
 
