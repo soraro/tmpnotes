@@ -14,8 +14,8 @@ func Test_GetConfig(t *testing.T) {
 	}{
 		{
 			name: "Test 1",
-			args: map[string]string{"PORT": "5000", "REDIS_URL": "redis://localhost:1234"},
-			want: specification{Port: 5000, RedisUrl: "redis://localhost:1234"},
+			args: map[string]string{"PORT": "7000", "REDIS_URL": "redis://localhost:1234"},
+			want: specification{Port: 7000, RedisUrl: "redis://localhost:1234"},
 		},
 		{
 			name: "Test 2",
