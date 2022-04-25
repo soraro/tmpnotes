@@ -26,6 +26,7 @@ func main() {
 
 	http.Handle("/", http.FileServer(http.Dir("./static")))
 	http.HandleFunc("/new", notes.AddNote)
+	http.HandleFunc("/new/countdown", notes.AddCountdownNote)
 	http.HandleFunc("/id/", notes.GetNote)
 	http.HandleFunc("/counts", notes.GetCounts)
 	http.HandleFunc("/healthz", health.HealthCheck)

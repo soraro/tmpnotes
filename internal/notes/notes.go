@@ -93,6 +93,50 @@ func AddNote(w http.ResponseWriter, r *http.Request) {
 
 }
 
+func AddCountdownNote(w http.ResponseWriter, r *http.Request) {
+
+	log.Info(r.RequestURI)
+	if r.Method != "POST" {
+		log.Errorf("%s Invalid request method: %s", r.RequestURI, r.Method)
+		w.Header().Set("Allow", "POST")
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
+
+	var n note
+	err := json.NewDecoder(r.Body).Decode(&n)
+	if err != nil {
+		http.Error(w, "Invalid Request", 400)
+		return
+	}
+	if n.Expire < 1 {
+		// Avoid having no expiration time
+		n.Expire = 1
+	}
+
+	if n.Expire > maxExpire {
+		log.Errorf("%s Expiration set too high: %v", r.RequestURI, n.Expire)
+		http.Error(w, "Invalid Request - TTL is too high", 400)
+		return
+	}
+
+	if !checkAcceptableLength(n.Message) {
+		log.Errorf("%s Message size too large: %v", r.RequestURI, len(n.Message))
+		http.Error(w, "Invalid Request", 400)
+		return
+	}
+	id, key := generateIdAndKey()
+
+	encryptedMessage, err := encryptNote(n.Message, key)
+	if err != nil {
+		log.Errorf("%s Issue encrypting message: %s", r.RequestURI, err)
+	}
+	pipe := rdb.Pipeline()
+
+	// fmt.Println(id, encryptedMessage, pipe)
+
+}
+
 // The first 8 characters will be the redis key (id)
 // The last 24 characters will be the key to encrypt the note
 func generateIdAndKey() (string, string) {
