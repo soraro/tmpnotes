@@ -5,6 +5,8 @@ import (
 	"net/http"
 
 	log "github.com/sirupsen/logrus"
+
+	h "tmpnotes/internal/headers"
 )
 
 type counts struct {
@@ -14,7 +16,7 @@ type counts struct {
 }
 
 func GetCounts(w http.ResponseWriter, r *http.Request) {
-
+	h.AddStandardHeaders(w.Header())
 	log.Info(r.RequestURI)
 
 	if r.Method != "GET" {

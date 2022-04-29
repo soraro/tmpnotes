@@ -15,12 +15,12 @@ func Test_GetConfig(t *testing.T) {
 		{
 			name: "Test 1",
 			args: map[string]string{"PORT": "7000", "REDIS_URL": "redis://localhost:1234"},
-			want: specification{Port: 7000, RedisUrl: "redis://localhost:1234"},
+			want: specification{Port: 7000, RedisUrl: "redis://localhost:1234", EnableHsts: false},
 		},
 		{
 			name: "Test 2",
-			args: map[string]string{"TMPNOTES_PORT": "6000", "TMPNOTES_REDIS_URL": "rediss://someserver:1234"},
-			want: specification{Port: 6000, RedisUrl: "rediss://someserver:1234"},
+			args: map[string]string{"TMPNOTES_PORT": "6000", "TMPNOTES_REDIS_URL": "rediss://someserver:1234", "TMPNOTES_ENABLE_HSTS": "true"},
+			want: specification{Port: 6000, RedisUrl: "rediss://someserver:1234", EnableHsts: true},
 		},
 	}
 	for _, tt := range tests {

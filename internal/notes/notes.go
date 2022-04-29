@@ -17,6 +17,7 @@ import (
 
 	cfg "tmpnotes/internal/config"
 	"tmpnotes/internal/crypto"
+	h "tmpnotes/internal/headers"
 )
 
 const maxLength = 1000
@@ -142,6 +143,7 @@ func GetNote(w http.ResponseWriter, r *http.Request) {
 	id := full[:8]
 	key := full[8:]
 	log.Info(id)
+	h.AddStandardHeaders(w.Header())
 
 	if r.Method != "GET" {
 		log.Errorf("%s Invalid request method: %s", id, r.Method)
