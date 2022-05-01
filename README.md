@@ -22,6 +22,7 @@ The following table shows environment variables that can be used to configure yo
 |---------|------|-------------|---------|
 | `TMPNOTES_PORT` | int | Port number for the application to use. The env var `PORT` can also be used. | `5000` |
 | `TMPNOTES_REDIS_URL` | string | Redis URI / connection string. `REDIS_URL` can also be used. | `redis://localhost:6379` |
+| `TMPNOTES_ENABLE_HSTS` | bool | Return `"Strict-Transport-Security", "max-age=15552000"` header to enforce TLS for web browser clients. Only use this if you are sure your instance is running behind a reverse proxy with TLS. | `false` |
 
 ## docker-compose
 We have provided a `docker-compose` file to easily build and host a functional TMPNOTES system.
