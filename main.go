@@ -7,7 +7,6 @@ import (
 	log "github.com/sirupsen/logrus"
 
 	cfg "tmpnotes/internal/config"
-	h "tmpnotes/internal/headers"
 	"tmpnotes/internal/health"
 	"tmpnotes/internal/notes"
 	"tmpnotes/internal/version"
@@ -22,24 +21,44 @@ func init() {
 	notes.RedisInit()
 }
 
+func addStandardHeaders(h http.Header) {
+	h.Set("Content-Security-Policy", "default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com; style-src 'self' https://cdn.jsdelivr.net")
+	h.Set("X-Frame-Options", "DENY")
+	h.Set("X-Content-Type-Options", "nosniff")
+	h.Set("X-XSS-Protection", "1; mode=block")
+	if cfg.Config.EnableHsts {
+		h.Set("Strict-Transport-Security", "max-age=15552000")
+	}
+}
+
+type tmpnotesHandler func(http.ResponseWriter, *http.Request)
+
+func (th tmpnotesHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	// Anything we want to add for all requests can go in this handler
+	if r.Method == "GET" {
+		addStandardHeaders(w.Header())
+	}
+	th(w, r)
+}
+
 func main() {
 	port := fmt.Sprint(":", cfg.Config.Port)
 
 	fs := http.FileServer(http.Dir("./static"))
-	http.Handle("/", addHeaders(fs))
-	http.HandleFunc("/new", notes.AddNote)
-	http.HandleFunc("/id/", notes.GetNote)
-	http.HandleFunc("/counts", notes.GetCounts)
-	http.HandleFunc("/healthz", health.HealthCheck)
-	http.HandleFunc("/version", version.GetVersion)
+	http.Handle("/", serveStatic(fs))
+	http.Handle("/new", tmpnotesHandler(notes.AddNote))
+	http.Handle("/id/", tmpnotesHandler(notes.GetNote))
+	http.Handle("/counts", tmpnotesHandler(notes.GetCounts))
+	http.Handle("/healthz", tmpnotesHandler(health.HealthCheck))
+	http.Handle("/version", tmpnotesHandler(version.GetVersion))
 	log.Info("Server listening at ", port)
 	http.ListenAndServe(port, nil)
 }
 
-func addHeaders(fs http.Handler) http.HandlerFunc {
+func serveStatic(fs http.Handler) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		log.Info(r.RequestURI)
-		h.AddStandardHeaders(w.Header())
+		addStandardHeaders(w.Header())
 		fs.ServeHTTP(w, r)
 	}
 }
