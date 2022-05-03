@@ -1,7 +1,9 @@
-body { background-color: var(--bs-dark) !important;
-       color: var(--bs-light);
+body {
+  background-color: var(--bs-dark) !important;
+  color: var(--bs-light);
 }
-.row{
+
+.row {
   margin-bottom: 5%;
   --bs-gutter-x: 0;
 }
@@ -10,7 +12,7 @@ body { background-color: var(--bs-dark) !important;
   width: 99%;
 }
 
-.footer{
+.footer {
   display: table;
   text-align: center;
   margin-left: auto;
@@ -25,9 +27,33 @@ body { background-color: var(--bs-dark) !important;
     font-size: small;
     text-align: left;
   }
-  
+
 }
+
 #home-link {
   text-decoration: none;
   color: inherit;
+}
+
+#note-id {
+  visibility: hidden;
+  text-align: center;
+}
+
+#footer-container {
+  border: 1px solid white;
+}
+
+#copy-button,
+#dec-button,
+#notification-row,
+#note-row,
+#dec-input {
+  visibility: hidden;
+}
+
+
+#gh-button-star,
+#gh-button-issue {
+  padding: unset;
 }

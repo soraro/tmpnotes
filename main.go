@@ -7,6 +7,7 @@ import (
 	log "github.com/sirupsen/logrus"
 
 	cfg "tmpnotes/internal/config"
+	h "tmpnotes/internal/headers"
 	"tmpnotes/internal/health"
 	"tmpnotes/internal/notes"
 	"tmpnotes/internal/version"
@@ -24,7 +25,8 @@ func init() {
 func main() {
 	port := fmt.Sprint(":", cfg.Config.Port)
 
-	http.Handle("/", http.FileServer(http.Dir("./static")))
+	fs := http.FileServer(http.Dir("./static"))
+	http.Handle("/", addHeaders(fs))
 	http.HandleFunc("/new", notes.AddNote)
 	http.HandleFunc("/id/", notes.GetNote)
 	http.HandleFunc("/counts", notes.GetCounts)
@@ -32,4 +34,12 @@ func main() {
 	http.HandleFunc("/version", version.GetVersion)
 	log.Info("Server listening at ", port)
 	http.ListenAndServe(port, nil)
+}
+
+func addHeaders(fs http.Handler) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		log.Info(r.RequestURI)
+		h.AddStandardHeaders(w.Header())
+		fs.ServeHTTP(w, r)
+	}
 }
