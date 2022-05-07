@@ -5,7 +5,6 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
-	"html/template"
 	"io"
 	"net/http"
 	"strings"
@@ -18,9 +17,6 @@ import (
 	cfg "tmpnotes/internal/config"
 	"tmpnotes/internal/crypto"
 )
-
-const maxLength = 1000
-const maxExpire = 24
 
 var (
 	ctx = context.Background()
@@ -64,7 +60,7 @@ func AddNote(w http.ResponseWriter, r *http.Request) {
 		n.Expire = 1
 	}
 
-	if n.Expire > maxExpire {
+	if n.Expire > cfg.Config.MaxExpire {
 		log.Errorf("%s Expiration set too high: %v", r.RequestURI, n.Expire)
 		http.Error(w, "Invalid Request - TTL is too high", 400)
 		return
@@ -120,7 +116,7 @@ func keyBytes(key string) *[32]byte {
 }
 
 func checkAcceptableLength(m string) bool {
-	return len(m) <= maxLength
+	return len(m) <= cfg.Config.MaxLength
 }
 
 // return the type of note from the first 5 characters
@@ -157,8 +153,7 @@ func GetNote(w http.ResponseWriter, r *http.Request) {
 		if textResponse(r.UserAgent()) {
 			fmt.Fprintf(w, "404 - Nothing to see here\n")
 		} else {
-			t, _ := template.ParseFiles("./templates/404.html")
-			t.Execute(w, nil)
+			cfg.Tmpl.ExecuteTemplate(w, "404.html", nil)
 		}
 		return
 	case err != nil:
@@ -170,8 +165,7 @@ func GetNote(w http.ResponseWriter, r *http.Request) {
 		if textResponse(r.UserAgent()) {
 			fmt.Fprintf(w, "404 - Nothing to see here")
 		} else {
-			t, _ := template.ParseFiles("./templates/404.html")
-			t.Execute(w, nil)
+			cfg.Tmpl.ExecuteTemplate(w, "404.html", nil)
 		}
 		return
 	}
@@ -192,12 +186,7 @@ func GetNote(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	t, err := template.ParseFiles("./templates/note.html")
-	if err != nil {
-		log.Errorf("%s Error rendering note: %s", id, err)
-		http.Error(w, "Error rendering note", 500)
-	}
-	t.Execute(w, nil)
+	cfg.Tmpl.ExecuteTemplate(w, "note.html", nil)
 }
 
 // Check headers to see if we should return the data or not.

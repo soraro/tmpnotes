@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    {{template "title-and-css"}}
+    {{template "crypto-js"}}
+    <script src="createnote.js" defer></script>
+</head>
+
+<body class="py-4">
+    <div class="container">
+        {{template "home"}}
+        <h2>Note:</h2>
+        <div class="row">
+            <div class="col-lg-9">
+                <label for="notes-input">Maximum <b id="ui-expire">{{.UiMaxLength}}</b> characters allowed</label>
+                <textarea class="form-control" id="notes-input" rows="7" maxlength="{{.UiMaxLength}}"></textarea>
+            </div>
+            <div class="col">
+                <div class="row">
+                    <br>Hours before disappearing<br>
+                    <select class="custom-select" id="hours-input">
+                        {{range .ExpireHours -}}
+                        <option>{{.}}</option>
+                        {{end}}
+                    </select>
+                </div>
+                <div class="row">
+                    <br>
+                    <button type="submit" id="send-button" class="btn btn-primary btn-block">Send</button>
+                </div>
+            </div>
+        </div>
+        <div class="row" id="encrypt-row">
+            <div class="col-lg-9">
+                <div class="form-group">
+                    <label for="enc-key">
+                        <h3>Optional encryption key</h3>(encrypt your message before sending it to the
+                        server)
+                    </label>
+                    <input type="password" class="form-control" id="enc-key" placeholder="Your passphrase here">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-9">
+                <div class="form-group">
+                    <input type="text" class="form-control mt-1" id="note-id" readonly>
+                </div>
+            </div>
+            <div class="col-lg d-grid">
+                <button type="submit" id="copy-button" class="btn btn-primary mb-2 btn-block mt-1">copy</button>
+            </div>
+        </div>
+    </div>
+</body>
+{{template "footer"}}
+
+</html>
