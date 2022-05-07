@@ -1,17 +1,17 @@
 package config
 
-import(
+import (
 	"html/template"
 )
 
 var (
 	Tmpl *template.Template
-	err error
+	err  error
 )
 
-func GetTemplates() error{
+func GetTemplates() error {
 	Tmpl, err = template.ParseGlob("templates/*")
-	if err != nil{
+	if err != nil {
 		return err
 	}
 	return nil
