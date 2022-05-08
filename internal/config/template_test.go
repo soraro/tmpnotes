@@ -6,17 +6,17 @@ func TestGetTemplates(t *testing.T) {
 	tests := []struct {
 		name    string
 		wantErr bool
-		path string
+		path    string
 	}{
 		{
-			name: "Test 1",
+			name:    "Test 1",
 			wantErr: false,
-			path: "../../templates/*",
+			path:    "../../templates/*",
 		},
 		{
-			name: "Test 2",
+			name:    "Test 2",
 			wantErr: true,
-			path: "../../test_files/bad_templates/*",
+			path:    "../../test_files/bad_templates/*",
 		},
 	}
 	for _, tt := range tests {
