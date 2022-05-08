@@ -2,10 +2,10 @@ document.addEventListener('keydown', countInput);
 document.addEventListener('keyup', countInput);
 document.getElementById("send-button").addEventListener("click", postInfo)
 document.getElementById("copy-button").addEventListener("click", copyLink)
+const maxChars = Number(document.getElementById("ui-expire").textContent)
 
 function countInput(e) {
     const input = document.getElementById('notes-input');
-    const maxChars = 512
     input.labels[0].innerText = input.textLength + "/" + maxChars
 }
 

@@ -3,9 +3,12 @@ package notes
 import (
 	"strings"
 	"testing"
+
+	cfg "tmpnotes/internal/config"
 )
 
 func Test_checkAcceptableLength(t *testing.T) {
+	cfg.GetConfig()
 	tests := []struct {
 		name string
 		args string
@@ -13,7 +16,7 @@ func Test_checkAcceptableLength(t *testing.T) {
 	}{
 		{
 			name: "Test 1",
-			args: strings.Repeat("a", maxLength+1),
+			args: strings.Repeat("a", cfg.Config.MaxLength+1),
 			want: false,
 		},
 		{
@@ -23,7 +26,7 @@ func Test_checkAcceptableLength(t *testing.T) {
 		},
 		{
 			name: "Test 3",
-			args: strings.Repeat("a", maxLength),
+			args: strings.Repeat("a", cfg.Config.MaxLength),
 			want: true,
 		},
 	}

@@ -1,0 +1,3 @@
+{{defin "fail"}}
+This should fail because "define" is spelled wrong
+{{end}}

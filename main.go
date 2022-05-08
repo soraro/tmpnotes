@@ -12,13 +12,31 @@ import (
 	"tmpnotes/internal/version"
 )
 
+//used for data to template the expiration options available
+type homeTemplate struct {
+	ExpireHours []int
+	UiMaxLength int
+}
+
+var ht homeTemplate
+
 func init() {
 	log.SetFormatter(&log.JSONFormatter{})
 	err := cfg.GetConfig()
 	if err != nil {
 		log.Fatal(err)
 	}
+	err = cfg.GetTemplates()
+	if err != nil {
+		log.Fatal(err)
+	}
 	notes.RedisInit()
+
+	// create slice to template index.html
+	for i := 1; i <= cfg.Config.MaxExpire; i++ {
+		ht.ExpireHours = append(ht.ExpireHours, i)
+	}
+	ht.UiMaxLength = cfg.Config.UiMaxLength
 }
 
 func addStandardHeaders(h http.Header) {
@@ -59,6 +77,12 @@ func serveStatic(fs http.Handler) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		log.Info(r.RequestURI)
 		addStandardHeaders(w.Header())
-		fs.ServeHTTP(w, r)
+
+		// template index.html instead of serving it from the fileserver
+		if r.RequestURI == "/" || r.RequestURI == "/index.html" {
+			cfg.Tmpl.ExecuteTemplate(w, "index.html", ht)
+		} else {
+			fs.ServeHTTP(w, r)
+		}
 	}
 }

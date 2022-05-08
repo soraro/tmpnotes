@@ -20,9 +20,12 @@ We understand that secrets are sensitive and people may not want to use a public
 The following table shows environment variables that can be used to configure your TMPNOTES installation:
 | Env var | Type | Description | Default |
 |---------|------|-------------|---------|
+| `TMPNOTES_ENABLE_HSTS` | bool | Return `"Strict-Transport-Security", "max-age=15552000"` header to enforce TLS for web browser clients. Only use this if you are sure your instance is running behind a reverse proxy with TLS. | `false` |
+| `TMPNOTES_MAX_EXPIRE` | int | The maximum number of hours allowed before a note expires. | `24` |
+| `TMPNOTES_MAX_LENGTH` | int | The maximum length (in characters) that a note is allowed to be. This should always be larger than `TMPNOTES_UI_MAX_LENGTH` to give room for the optional encryption padding in the UI. | `1000` |
+| `TMPNOTES_UI_MAX_LENGTH` | int | The maximum length (in characters) that a note is allowed to be in the UI. This value should always be less than `TMPNOTES_MAX_LENGTH` to give room for the optional encryption padding in the UI. | `512` |
 | `TMPNOTES_PORT` | int | Port number for the application to use. The env var `PORT` can also be used. | `5000` |
 | `TMPNOTES_REDIS_URL` | string | Redis URI / connection string. `REDIS_URL` can also be used. | `redis://localhost:6379` |
-| `TMPNOTES_ENABLE_HSTS` | bool | Return `"Strict-Transport-Security", "max-age=15552000"` header to enforce TLS for web browser clients. Only use this if you are sure your instance is running behind a reverse proxy with TLS. | `false` |
 
 ## docker-compose
 We have provided a `docker-compose` file to easily build and host a functional TMPNOTES system.
