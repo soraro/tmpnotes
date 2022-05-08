@@ -16,7 +16,7 @@ func TestGetTemplates(t *testing.T) {
 		{
 			name:    "Test 2",
 			wantErr: true,
-			path:    "../../test_files/bad_templates/*",
+			path:    "../../test_data/bad_templates/*",
 		},
 	}
 	for _, tt := range tests {
