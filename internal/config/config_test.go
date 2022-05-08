@@ -54,7 +54,7 @@ func Test_GetConfig_Error(t *testing.T) {
 				defer os.Unsetenv(env)
 			}
 			err := GetConfig()
-			if err == nil {
+			if err.Error() != "UiMaxLength 6000 should not be greater than MaxLength 2000" {
 				t.Errorf("UiMaxLength %v should cause an error since it is larger than MaxLength %v", Config.UiMaxLength, Config.MaxLength)
 			}
 		})
