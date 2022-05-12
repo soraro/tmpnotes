@@ -15,8 +15,6 @@ function postInfo() {
     var e = document.getElementById("notes-input");
     var key = document.getElementById("enc-key");
     var note = encryptNote(e.value, key.value);
-    e.readOnly = true;
-    document.getElementById("send-button").style.visibility = "hidden";
     var data = { "message": note, "expire": parseInt(hours) }
     var opts = {
         method: 'POST',
@@ -29,10 +27,21 @@ function postInfo() {
     var req = new Request(location.origin + "/new", opts)
 
     fetch(req).then(function (response) {
-        return response.text().then(function (text) {
-            e = document.getElementById("note-id");
-            e.value = location.origin + "/id/" + text;
-        });
+        if (response.status === 500) {
+            console.log('note creation failed')
+            alert("Can't connect to the database. Try again later.")
+        } else {
+            return response.text().then(function (text) {
+                document.getElementById("send-button").style.visibility = "hidden";
+                e.readOnly = true;
+                e = document.getElementById("note-id");
+                e.value = location.origin + "/id/" + text;
+                e = document.getElementById("note-id");
+                e.style.visibility = "visible";
+                document.getElementById("copy-button").style.visibility = "visible";
+                document.getElementById("encrypt-row").remove();
+            });
+        }
     })
         .catch(error => {
             console.log('request failed', error);
@@ -40,10 +49,6 @@ function postInfo() {
             throw error;
         });
 
-    e = document.getElementById("note-id");
-    e.style.visibility = "visible";
-    document.getElementById("copy-button").style.visibility = "visible";
-    document.getElementById("encrypt-row").remove();
 }
 
 function copyLink() {

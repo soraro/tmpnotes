@@ -83,6 +83,8 @@ func AddNote(w http.ResponseWriter, r *http.Request) {
 	_, err = pipe.Exec(ctx)
 	if err != nil {
 		log.Errorf("%s Error setting note values: %s", r.RequestURI, err)
+		http.Error(w, "Error connecting to database", 500)
+		return
 	}
 
 	fmt.Fprint(w, id+key)
