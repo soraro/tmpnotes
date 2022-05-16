@@ -133,10 +133,23 @@ func noteType(note string) string {
 }
 
 func GetNote(w http.ResponseWriter, r *http.Request) {
+	var id, key string
 
 	full := strings.ReplaceAll(r.RequestURI, "/id/", "")
-	id := full[:8]
-	key := full[8:]
+
+	if !checkCorrectIdLength(full) {
+		w.WriteHeader(404)
+		if textResponse(r.UserAgent()) {
+			fmt.Fprintf(w, "404 - Nothing to see here\n")
+		} else {
+			cfg.Tmpl.ExecuteTemplate(w, "404.html", nil)
+		}
+		log.Errorf("Incorrect length for the note id: %s", r.RequestURI)
+		return
+	} else {
+		id = full[:8]
+		key = full[8:]
+	}
 	log.Info(id)
 
 	if r.Method != "GET" {
@@ -187,6 +200,16 @@ func GetNote(w http.ResponseWriter, r *http.Request) {
 	}
 
 	cfg.Tmpl.ExecuteTemplate(w, "note.html", nil)
+}
+
+func checkCorrectIdLength(id string) bool {
+	// check if the id is exactly 32 characters, otherwise 404
+	if len(id) == 32 {
+		return true
+	} else {
+		return false
+	}
+
 }
 
 // Check headers to see if we should return the data or not.

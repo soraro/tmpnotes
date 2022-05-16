@@ -3,7 +3,6 @@ package notes
 import (
 	"strings"
 	"testing"
-
 	cfg "tmpnotes/internal/config"
 )
 
@@ -169,5 +168,37 @@ func Test_encryptDecrypt(t *testing.T) {
 
 	if plainText != "test" {
 		t.Errorf("Decrypted text should be \"test\" but instead got: %s", plainText)
+	}
+}
+
+func Test_checkCorrectIdLength(t *testing.T) {
+	id, key := generateIdAndKey()
+	tests := []struct {
+		name string
+		id   string
+		want bool
+	}{
+		{
+			name: "Test 1",
+			id:   "477169323557440DAB61C36A5EAE88B1",
+			want: true,
+		},
+		{
+			name: "Test 2",
+			id:   "123",
+			want: false,
+		},
+		{
+			name: "Test 3",
+			id:   id + key,
+			want: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := checkCorrectIdLength(tt.id); got != tt.want {
+				t.Errorf("checkIdLength() = %v, want %v", got, tt.want)
+			}
+		})
 	}
 }
