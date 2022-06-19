@@ -1,0 +1,21 @@
+services:
+  redis:
+    image: "redis:latest"
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 1s
+      timeout: 1s
+      retries: 10
+  tmpnotes:
+    build: .
+    ports:
+      - "5000:5000"
+    environment:
+      REDIS_URL: redis://redis
+    depends_on:
+      redis:
+        condition: service_healthy
+    deploy:
+      restart_policy:
+        condition: on-failure
+        max_attempts: 5
