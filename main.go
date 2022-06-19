@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	log "github.com/sirupsen/logrus"
+	"github.com/go-chi/chi/v5"
 
 	cfg "tmpnotes/internal/config"
 	"tmpnotes/internal/health"
@@ -61,16 +62,17 @@ func (th tmpnotesHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	port := fmt.Sprint(":", cfg.Config.Port)
+	r := chi.NewRouter()
 
 	fs := http.FileServer(http.Dir("./static"))
-	http.Handle("/", serveStatic(fs))
-	http.Handle("/new", tmpnotesHandler(notes.AddNote))
-	http.Handle("/id/", tmpnotesHandler(notes.GetNote))
-	http.Handle("/counts", tmpnotesHandler(notes.GetCounts))
-	http.Handle("/healthz", tmpnotesHandler(health.HealthCheck))
-	http.Handle("/version", tmpnotesHandler(version.GetVersion))
+	r.Method("POST", "/new", tmpnotesHandler(notes.AddNote))
+	r.Method("GET", "/id/*", tmpnotesHandler(notes.GetNote))
+	r.Method("GET", "/counts", tmpnotesHandler(notes.GetCounts))
+	r.Method("GET", "/healthz", tmpnotesHandler(health.HealthCheck))
+	r.Method("GET", "/version", tmpnotesHandler(version.GetVersion))
+	r.Get("/*", serveStatic(fs))
 	log.Info("Server listening at ", port)
-	http.ListenAndServe(port, nil)
+	http.ListenAndServe(port, r)
 }
 
 func serveStatic(fs http.Handler) http.HandlerFunc {
