@@ -60,8 +60,8 @@ curl https://tmpnotes.com/id/$ID
 You will need golang version 1.17. In addition, docker is recommended to run a local redis instance.
 
 ```
-docker run -d --rm -p 6379:6379 redis
-go build .
+make dev
+make build
 ./tmpnotes
 
 # navigate to http://localhost:5000 to see your local tmpnotes instance
@@ -69,7 +69,7 @@ go build .
 
 Test:
 ```
-go test -v ./...
+make test
 ```
 
 # Questions / Comments / Suggestions
