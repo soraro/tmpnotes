@@ -14,21 +14,21 @@ imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
 
-serviceAccount:
-  # Specifies whether a service account should be created
-  create: true
-  # Annotations to add to the service account
-  annotations: {}
-  # The name of the service account to use.
-  # If not set and create is true, a name is generated using the fullname template
-  name: ""
-
 podAnnotations: {}
 
-podSecurityContext: {}
-  # fsGroup: 2000
+podSecurityContext:
+  runAsUser: 65534
+  runAsGroup: 65534
+  runAsNonRoot: true
+  seccompProfile:
+    type: "RuntimeDefault"
 
-securityContext: {}
+securityContext:          
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  privileged: false
+  capabilities:
+    drop: ["ALL"]
 
 service:
   type: ClusterIP
@@ -60,10 +60,10 @@ resources:
 
 autoscaling:
   enabled: false
-  minReplicas: 1
-  maxReplicas: 5
-  targetCPUUtilizationPercentage: 80
-  # targetMemoryUtilizationPercentage: 80
+#  minReplicas: 1
+#  maxReplicas: 5
+#  targetCPUUtilizationPercentage: 80
+#  targetMemoryUtilizationPercentage: 80
 
 nodeSelector: {}
 
@@ -73,3 +73,4 @@ affinity: {}
 
 redis:
   enabled: true
+  password: Sup3rSecretPassphrase

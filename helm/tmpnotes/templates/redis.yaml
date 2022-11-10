@@ -31,8 +31,13 @@ spec:
             - /bitnami/redis/data
           image: bitnami/redis:6.2
           env:
+          {{- if .Values.redis.password }}
+            - name: REDIS_PASSWORD
+              value: {{ .Values.redis.password }}
+          {{- else }}
             - name: ALLOW_EMPTY_PASSWORD
               value: 'yes'
+          {{- end }}
           imagePullPolicy: Always
           name: redis
           ports:
