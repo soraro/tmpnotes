@@ -49,7 +49,7 @@ spec:
             {{- if .Values.redis.enabled }}
             {{- if .Values.redis.password }}
             - name: "TMPNOTES_REDIS_URL"
-              value: redis://default:{{.Values.redis.password}}@redis:6379
+              value: redis://default:{{.Values.redis.password}}@tmpnotes-redis:6379
             {{- else }}
             - name: "TMPNOTES_REDIS_URL"
               value: redis://redis:6379
