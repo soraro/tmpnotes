@@ -10,6 +10,16 @@ image:
   # Overrides the image tag whose default is the chart appVersion.
   tag: "latest"
 
+envVars:
+  - name: TMPNOTES_PORT
+    value: "5000"
+#  - name: TMPNOTES_REDIS_URL
+#    value: "redis://my-custom-redis:6379"
+#  - name: TMPNOTES_ENABLE_HSTS
+#    value: "true"
+#  - name: TMPNOTES_MAX_EXPIRE
+#    value: "24"
+
 imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
@@ -23,7 +33,7 @@ podSecurityContext:
   seccompProfile:
     type: "RuntimeDefault"
 
-securityContext:          
+securityContext:
   allowPrivilegeEscalation: false
   readOnlyRootFilesystem: true
   privileged: false

@@ -48,15 +48,14 @@ spec:
           env:
             {{- if .Values.redis.enabled }}
             {{- if .Values.redis.password }}
-            - name: "TMPNOTES_REDIS_URL"
+            - name: TMPNOTES_REDIS_URL
               value: redis://default:{{.Values.redis.password}}@tmpnotes-redis:6379
             {{- else }}
-            - name: "TMPNOTES_REDIS_URL"
-              value: redis://redis:6379
+            - name: TMPNOTES_REDIS_URL
+              value: redis://tmpnotes-redis:6379
             {{- end }}
             {{- end }}
-            - name: "TMPNOTES_PORT"
-              value: "5000"
+            {{- toYaml .Values.envVars | nindent 12 }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       {{- with .Values.nodeSelector }}
