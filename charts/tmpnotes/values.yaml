@@ -84,3 +84,4 @@ affinity: {}
 redis:
   enabled: true
   password: Sup3rSecretPassphrase
+  persistenceEnabled: false
