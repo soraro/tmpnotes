@@ -12,7 +12,7 @@ import (
 	"tmpnotes/internal/version"
 )
 
-//used for data to template the expiration options available
+// used for data to template the expiration options available
 type homeTemplate struct {
 	ExpireHours []int
 	UiMaxLength int
@@ -31,6 +31,12 @@ func init() {
 		log.Fatal(err)
 	}
 	notes.RedisInit()
+
+	if cfg.Config.SlackToken != "" && cfg.Config.SlackSigningSecret != "" {
+		notes.SlackInit()
+	} else {
+		log.Info("Slack secrets not defined - disabling slack")
+	}
 
 	// create slice to template index.html
 	for i := 1; i <= cfg.Config.MaxExpire; i++ {
@@ -69,6 +75,9 @@ func main() {
 	http.Handle("/counts", tmpnotesHandler(notes.GetCounts))
 	http.Handle("/healthz", tmpnotesHandler(health.HealthCheck))
 	http.Handle("/version", tmpnotesHandler(version.GetVersion))
+	if notes.SlackEnabled {
+		http.Handle("/slack", tmpnotesHandler(notes.SlackHandler))
+	}
 	log.Info("Server listening at ", port)
 	http.ListenAndServe(port, nil)
 }
