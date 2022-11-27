@@ -23,7 +23,7 @@ spec:
           requests:
             storage: 5Gi
         volumeMode: Filesystem
-    {{- end }}
+  {{- end }}
   template:
     metadata:
       labels:
