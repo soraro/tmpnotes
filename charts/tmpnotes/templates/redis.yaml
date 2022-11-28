@@ -1,0 +1,89 @@
+{{ if .Values.redis.enabled }}
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: tmpnotes-redis
+spec:
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: tmpnotes-redis
+  serviceName: tmpnotes-redis
+  {{- if .Values.redis.persistenceEnabled }}
+  volumeClaimTemplates:
+    - apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
+        name: tmpnotes-redis-storage
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 5Gi
+        volumeMode: Filesystem
+  {{- end }}
+  template:
+    metadata:
+      labels:
+        app: tmpnotes-redis
+    spec:
+      automountServiceAccountToken: false
+      containers:
+        - image: bitnami/redis:7.0
+          env:
+          {{- if .Values.redis.password }}
+            - name: REDIS_PASSWORD
+              value: {{ .Values.redis.password }}
+          {{- else }}
+            - name: ALLOW_EMPTY_PASSWORD
+              value: 'yes'
+          {{- end }}
+          imagePullPolicy: Always
+          name: redis
+          ports:
+            - containerPort: 6379
+              protocol: TCP
+          resources:
+            requests:
+              memory: '100M'
+              cpu: '100m'
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          {{- if .Values.redis.persistenceEnabled }}
+          volumeMounts:
+            - mountPath: /bitnami/redis/data
+              name: tmpnotes-redis-storage
+          {{- end}}
+          securityContext:
+            allowPrivilegeEscalation: false
+            privileged: false
+            capabilities:
+              drop: ['ALL']
+      dnsPolicy: ClusterFirst
+      enableServiceLinks: true
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext:
+        runAsUser: 1001
+        runAsNonRoot: true
+        seccompProfile:
+          type: 'RuntimeDefault'
+      shareProcessNamespace: false
+      terminationGracePeriodSeconds: 30
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tmpnotes-redis
+spec:
+  ports:
+    - port: 6379
+      protocol: TCP
+      targetPort: 6379
+  selector:
+    app: tmpnotes-redis
+  sessionAffinity: None
+  type: ClusterIP
+{{ end }}
