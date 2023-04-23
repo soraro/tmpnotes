@@ -77,6 +77,7 @@ func main() {
 	http.Handle("/version", tmpnotesHandler(version.GetVersion))
 	if notes.SlackEnabled {
 		http.Handle("/slack", tmpnotesHandler(notes.SlackHandler))
+		http.Handle("/slack-response", tmpnotesHandler(notes.SlackResponseHandler))
 	}
 	log.Info("Server listening at ", port)
 	http.ListenAndServe(port, nil)
