@@ -12,7 +12,7 @@ import (
 	"tmpnotes/internal/version"
 )
 
-//used for data to template the expiration options available
+// used for data to template the expiration options available
 type homeTemplate struct {
 	ExpireHours []int
 	UiMaxLength int
