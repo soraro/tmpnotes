@@ -1,4 +1,4 @@
-FROM golang:1.17-alpine as build
+FROM golang:1.23-alpine as build
 WORKDIR /app
 ADD . .
 ENV GOPATH /go
